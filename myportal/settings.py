@@ -13,7 +13,7 @@ SECRET_KEY = config('DJANGO_SECRET_KEY', default='your-default-secret-key')
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['*']  # Добавим хосты для локальной разработки
+ALLOWED_HOSTS = ['django-tank-project.onrender.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -78,7 +78,8 @@ WSGI_APPLICATION = 'myportal.wsgi.application'
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3'),
-        conn_max_age=600
+        conn_max_age=600,
+        conn_health_checks=True
     )
 }
 
@@ -123,3 +124,17 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
