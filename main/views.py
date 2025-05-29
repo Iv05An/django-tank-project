@@ -471,6 +471,10 @@ def get_client_ip(request):
 
 logger = logging.getLogger(__name__)
 
+def test_route(request, slug):
+    logger.info(f"Test route hit for slug: {slug}")
+    return JsonResponse({'status': 'success', 'message': f'Test route for {slug}'})
+    
 def article_detail(request, slug):
     logger.info(f"Processing slug: {slug}")
     article = get_object_or_404(Article, slug=slug)

@@ -30,6 +30,6 @@ urlpatterns = [
     path('register/', views.enter, name='register'),
     path('add_comment/', views.add_comment, name='add_comment'),
     path('toggle_like_dislike/', views.toggle_like_dislike, name='toggle_like_dislike'),
-
+    path('test/<str:slug>/', views.test_route, name='test_route'),
     path('get_updates/<slug:slug>/', views.get_updates, name='get_updates'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
