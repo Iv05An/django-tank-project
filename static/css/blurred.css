@@ -1,0 +1,16 @@
+.blurred-edges {
+    width: 600px !important;
+    height: 275px !important;
+    object-fit: cover; /* Чтобы изображение заполняло контейнер */
+    filter: blur(0px);
+    margin: 20px auto;
+    display: block; /* Убеждаемся, что изображение блочное */
+
+
+    /* Маска для размытия по всем сторонам */
+    mask-image:
+        linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%), /* слева и справа */
+        linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%); /* сверху и снизу */
+    mask-composite: intersect; /* Объединяем маски, чтобы они работали вместе */
+
+}

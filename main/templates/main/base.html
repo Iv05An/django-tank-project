@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <link rel="stylesheet" href="{% static 'css/style_main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/blurred.css' %}">
+    <link rel="stylesheet" href="{% static 'css/drop-down_menu.css' %}">
+    <link rel="stylesheet" href="{% static 'css/headlines.css' %}">
+    <link rel="stylesheet" href="{% static 'css/navigation.css' %}">
+    <link rel="stylesheet" href="{% static 'css/slideshow.css' %}">
+    <link rel="stylesheet" href="{% static 'css/welcome-title.css' %}">
+    <link rel="stylesheet" href="{% static 'css/form.css' %}">
+    <link rel="stylesheet" href="{% static 'css/feedback.css' %}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&display=swap" rel="stylesheet">
+
+    <script src="{% static 'js/validation.js' %}"></script>
+
+    <style>
+        .header {
+<!--            color: red;-->
+<!--            font-size: 24px;-->
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SOVIET TANKS{% endblock %}</title>
+</head>
+<body>
+    <header>
+    <h1 class="header">SOVIET TANKS</h1>
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Главная</a></li>
+            <li class="dropdown">
+                <a href="#">Другие танки ▼</a>
+                <ul class="dropdown-menu">
+
+                    <li><a href="{% url 'article_detail' slug='t-34' %}">Танк Т-34</a></li>
+                    <li><a href="{% url 'article_detail' slug='is-3' %}">Танк ИС-3</a></li>
+                </ul>
+            </li>
+
+            <li><a href="{% url 'register' %}">Регистрация</a></li>
+            <li><a href="{% url 'feedback' %}">Обратная связь</a></li>
+        </ul>
+    </nav>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2025 Советские танки</p>
+    </footer>
+</body>
+</html>

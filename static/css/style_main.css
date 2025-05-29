@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Teko:wght@300..700&display=swap');
+
+body {
+    font-family: 'Teko', serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+
+    background-image: url("/static/images/5811611ad8f8aba2b1a2381683783bfa4ee65c4b.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: #333;
+
+    margin: 0;
+    padding: 0;
+    position: relative; /* Для позиционирования ::before */
+}
+
+/* Затуманивание всего фона */
+body::before {
+    content: "";
+    position: fixed; /* Фиксируем слой поверх фона */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.4); /* Полупрозрачный белый слой */
+    z-index: -1; /* Помещаем под контент */
+}
+
+main {
+    text-align: center;
+    padding: 20px;
+    /* Убираем background-color, так как затуманивание теперь на body */
+}
+
+.article-section {
+    max-width: 800px; /* Ограничение ширины для читаемости */
+    margin: 20px auto; /* Центрирование */
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.5); /* Оставляем для контраста текста */
+    border-radius: 5px; /* Скругленные углы */
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1px 0;
+    text-align: center;
+    background-image:
+        linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)),
+        url("/static/images/brick.jpg");
+    border: 2px solid black;
+    padding: 10px 0;
+    position: relative; /* Чтобы header был выше ::before */
+    z-index: 1; /* Помещаем поверх затуманивания */
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    z-index: 1; /* Помещаем поверх затуманивания */
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}

@@ -1,0 +1,88 @@
+nav {
+    font-family: 'Rubik Mono One', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center; /* Центрируем ссылки */
+
+    position: relative; /* Для сдвига списка внутри header */
+    top: -15px;
+}
+
+nav ul {
+    list-style: none; /* Убираем белые точки */
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li {
+    display: inline-block; /* Делаем ссылки в строку */
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #c2d6a1;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+    color: #5a6649;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/*.sidebar {
+
+    background-color: rgba(255, 255, 255, 0.5);
+    left: 20px;
+    top: 5px;
+    width: 225px;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+
+    z-index: 10;
+}*/
+.sidebar {
+    background-color: rgba(255, 255, 255, 0.5);
+    top: 0;            /* Прижимаем к верху экрана */
+    left: 0;           /* От левого края */
+    width: 100%;       /* Растягиваем по всей ширине экрана */
+    height: 50px;      /* Фиксированная высота, настройте под себя */
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    z-index: 10;
+    display: flex;     /* Используем flex для горизонтального расположения ссылок */
+    align-items: center; /* Выравниваем содержимое по центру по вертикали */
+}
+
+.section-nav {
+    font-size: 11px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-link {
+    display: block;
+    color: #333;
+    text-decoration: none;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    padding: 5px 0;
+}
+
+.nav-link:hover {
+    color: #5a6649;
+}

@@ -1,0 +1,312 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Танк ИС-3 - SOVIET TANKS{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<div class="article-section">
+    <h2>ИС-3 — мощь и броня советских тяжёлых танков</h2>
+    <p>ИС-3 (Иосиф Сталин-3) — советский тяжёлый танк, разработанный в конце Второй мировой войны и ставший одним из самых передовых боевых машин своего времени. Он отличался усиленной броневой защитой, мощным вооружением и новой, революционной формой корпуса, значительно повышавшей его живучесть в бою.</p>
+    <img src="{% static 'images/scale_1200(1).jpeg' %}" class="blurred-edges" alt="Танк ИС-3">
+    <h3>История создания</h3>
+    <p>Разработка ИС-3 началась в 1944 году с учётом опыта боёв на Восточном фронте. Советские инженеры стремились создать танк, способный противостоять новейшей немецкой технике, такой как «Тигр II». В 1945 году машина была принята на вооружение, но в боевых действиях Второй мировой войны поучаствовать не успела. Однако её появление произвело сильное впечатление на Запад, особенно после демонстрации на Параде Победы в Берлине в 1945 году.</p>
+    <img src="{% static 'images/359060_14_pic_144.jpg' %}" class="blurred-edges" alt="Танк ИС-3">
+    <h3>Технические характеристики</h3>
+    <ul>
+        <li><strong>Класс:</strong> тяжёлый танк</li>
+        <li><strong>Экипаж:</strong> 4 человека</li>
+        <li><strong>Вооружение:</strong> 122-мм пушка Д-25Т</li>
+        <li><strong>Броня:</strong> до 110 мм (лобовая часть)</li>
+        <li><strong>Двигатель:</strong> дизельный В-2-ИС, мощностью 520 л.с.</li>
+        <li><strong>Скорость:</strong> до 40 км/ч</li>
+        <li><strong>Запас хода:</strong> до 150 км</li>
+    </ul>
+    <h3>Особенности конструкции</h3>
+    <p>Главной особенностью ИС-3 стал новый корпус с характерной «щучьей» формой лобовой брони, значительно улучшавшей защиту от вражеских снарядов. Также была переработана компоновка башни — она стала более низкой и обтекаемой, что снижало вероятность попадания.</p>
+    <img src="{% static 'images/maxresdefault(1).jpg' %}" class="blurred-edges" alt="Танк ИС-3">
+    <h3>Эксплуатация и наследие</h3>
+    <p>ИС-3 активно использовался в армии СССР и поставлялся в другие страны. Он участвовал в ряде конфликтов, включая Ближневосточные войны и события в Венгрии (1956). Несмотря на сложное обслуживание, танк оставался на вооружении долгие годы, а его конструктивные решения повлияли на дальнейшее развитие советской бронетехники.</p>
+    <img src="{% static 'images/6bef012s-960.jpg' %}" class="blurred-edges" alt="Танк ИС-3">
+    <p>Сегодня ИС-3 можно увидеть в музеях и памятниках, он остаётся символом мощи советской танковой школы и технического превосходства своего времени.</p>
+
+    <!-- Лайки и дизлайки -->
+    <div class="like-dislike-section" style="margin: 20px 0;">
+        <button id="like-btn" class="{% if user_liked %}active{% endif %}" {% if user_liked %}disabled{% endif %}>👍 <span id="likes-count">{{ likes }}</span></button>
+        <button id="dislike-btn" class="{% if user_disliked %}active{% endif %}" {% if user_disliked %}disabled{% endif %}>👎 <span id="dislikes-count">{{ dislikes }}</span></button>
+    </div>
+
+    <!-- Комментарии -->
+    <div class="comments-section">
+        <h3>Комментарии</h3>
+        <div id="comments-list">
+            {% for comment in comments %}
+                <div class="comment" data-id="{{ comment.id }}">
+                    <strong>{{ comment.username }}</strong> ({{ comment.created_at }}):
+                    <p>{{ comment.content }}</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Форма для комментариев -->
+        <div class="feedback-container">
+            <h3>Оставить комментарий</h3>
+            <form id="comment-form" class="feedback-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    {{ comment_form.username.label_tag }}
+                    {{ comment_form.username }}
+                    <span class="error" id="username-error"></span>
+                </div>
+                <div class="form-group">
+                    {{ comment_form.content.label_tag }}
+                    {{ comment_form.content }}
+                    <span class="error" id="comment-error"></span>
+                </div>
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.like-dislike-section button {
+    padding: 8px 15px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+}
+.like-dislike-section button span {
+    margin-left: 5px;
+    min-width: 20px;
+    text-align: center;
+}
+.like-dislike-section button.active {
+    background-color: #007bff;
+    color: white;
+}
+.like-dislike-section button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+.comments-section {
+    margin-top: 20px;
+}
+.comment {
+    border-bottom: 1px solid #ccc;
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+.feedback-container {
+    margin-top: 20px;
+}
+.feedback-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.form-group input,
+.form-group textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+}
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+.form-group .error {
+    color: red;
+    font-size: 12px;
+}
+.feedback-form button {
+    padding: 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    align-self: flex-start;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const commentsList = document.getElementById('comments-list');
+    const likeBtn = document.getElementById('like-btn');
+    const dislikeBtn = document.getElementById('dislike-btn');
+    const likesCount = document.getElementById('likes-count');
+    const dislikesCount = document.getElementById('dislikes-count');
+    const articleId = "{{ article.id }}";
+    const contentTypeId = "{{ content_type_id }}";
+    const slug = "{{ article.slug }}";
+
+    // Отладка
+    console.log('Slug:', slug);
+    console.log('WebSocket URL:', `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws/article/${slug}/`);
+
+    // Проверка DOM-элементов
+    if (!likeBtn || !dislikeBtn || !commentsList || !likesCount || !dislikesCount) {
+        console.error('One or more DOM elements not found:', {
+            likeBtn: !!likeBtn,
+            dislikeBtn: !!dislikeBtn,
+            commentsList: !!commentsList,
+            likesCount: !!likesCount,
+            dislikesCount: !!dislikesCount
+        });
+        return;
+    }
+
+    // Подключение к WebSocket
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const wsUrl = `${wsProtocol}://${window.location.host}/ws/article/${slug}/`;
+    const socket = new WebSocket(wsUrl);
+
+    socket.onopen = () => {
+        console.log('WebSocket подключен');
+    };
+
+    socket.onmessage = (event) => {
+        console.log('Received WebSocket message:', event.data);
+        const data = JSON.parse(event.data);
+        if (data.type === 'article_update') {
+            // Обновление комментариев
+            commentsList.innerHTML = '';
+            data.data.comments.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'comment';
+                commentDiv.dataset.id = comment.id;
+                commentDiv.innerHTML = `
+                    <strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):
+                    <p>${comment.content}</p>
+                `;
+                commentsList.prepend(commentDiv);
+            });
+            // Обновление лайков и дизлайков
+            likesCount.textContent = data.data.likes;
+            dislikesCount.textContent = data.data.dislikes;
+            likeBtn.classList.toggle('active', data.data.user_liked || false);
+            dislikeBtn.classList.toggle('active', data.data.user_disliked || false);
+            likeBtn.disabled = data.data.user_liked || false;
+            dislikeBtn.disabled = data.data.user_disliked || false;
+        }
+    };
+
+    socket.onclose = () => {
+        console.error('WebSocket закрыт');
+    };
+
+    socket.onerror = (error) => {
+        console.error('WebSocket ошибка:', error);
+    };
+
+    // Обработка формы комментариев
+    const commentForm = document.getElementById('comment-form');
+    if (commentForm) {
+        commentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const usernameInput = commentForm.querySelector('input[name="username"]');
+            const contentInput = commentForm.querySelector('textarea[name="content"]');
+            const username = usernameInput.value;
+            const content = contentInput.value;
+
+            if (!username.trim()) {
+                document.getElementById('username-error').textContent = 'Имя не может быть пустым';
+                return;
+            }
+            if (!content.trim()) {
+                document.getElementById('comment-error').textContent = 'Комментарий не может быть пустым';
+                return;
+            }
+
+            fetch('{% url "add_comment" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    article_id: articleId,
+                    username: username,
+                    content: content,
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    usernameInput.value = '';
+                    contentInput.value = '';
+                    document.getElementById('username-error').textContent = '';
+                    document.getElementById('comment-error').textContent = '';
+                } else {
+                    document.getElementById('comment-error').textContent = data.message || 'Ошибка при добавлении комментария';
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                document.getElementById('comment-error').textContent = 'Произошла ошибка при отправке комментария';
+            });
+        });
+    }
+
+    // Обработка лайков и дизлайков
+    function toggleLikeDislike(action) {
+        likeBtn.disabled = true;
+        dislikeBtn.disabled = true;
+
+        fetch('{% url "toggle_like_dislike" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({
+                content_type_id: contentTypeId,
+                object_id: articleId,
+                action: action,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                likesCount.textContent = data.likes;
+                dislikesCount.textContent = data.dislikes;
+                likeBtn.classList.toggle('active', data.user_liked || false);
+                dislikeBtn.classList.toggle('active', data.user_disliked || false);
+                likeBtn.disabled = data.user_liked || false;
+                dislikeBtn.disabled = data.user_disliked || false;
+            } else {
+                console.error('Ошибка:', data.message);
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка при отправке лайка/дизлайка');
+        })
+        .finally(() => {
+            if (!likeBtn.classList.contains('active')) likeBtn.disabled = false;
+            if (!dislikeBtn.classList.contains('active')) dislikeBtn.disabled = false;
+        });
+    }
+
+    likeBtn.addEventListener('click', () => toggleLikeDislike('like'));
+    dislikeBtn.addEventListener('click', () => toggleLikeDislike('dislike'));
+});
+</script>
+{% endblock %}

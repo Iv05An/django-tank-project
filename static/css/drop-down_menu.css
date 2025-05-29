@@ -1,0 +1,32 @@
+nav ul li.dropdown {
+    position: relative; /* Для правильного позиционирования подменю */
+}
+
+nav ul li .dropdown-menu {
+    display: none; /* Скрыто по умолчанию */
+    position: absolute; /* Располагаем подменю под родительским элементом */
+    left: 0;
+    top: 100%; /* Меню появляется сразу под родителем */
+    background-color: #333;
+    padding: 10px;
+    list-style-type: none;
+    margin: 0;
+    border-radius: 5px;
+}
+
+nav ul li.dropdown:hover .dropdown-menu {
+    display: block; /* Показываем подменю при наведении */
+}
+
+nav ul li .dropdown-menu li {
+    display: block; /* Элементы подменю в столбик */
+    margin: 5px 0;
+}
+
+nav ul li .dropdown-menu li a {
+    color: #fff;
+}
+
+nav ul li .dropdown-menu li a:hover {
+    color: #d0d8b0;
+}

@@ -1,0 +1,85 @@
+.slideshow-container {
+    width: 100%; /* Занимает всю ширину экрана */
+    max-width: 600px; /* Ограничение для больших экранов */
+    height: auto; /* Высота определяется содержимым (изображениями) */
+    aspect-ratio: 2 / 1; /* Соотношение сторон 2:1 */
+    overflow: hidden; /* Скрываем лишнее */
+    position: relative;
+    margin: 0 auto; /* Центрируем контейнер */
+}
+
+.slideshow {
+    display: flex;
+    width: 300%; /* 100% * 3 изображения */
+    height: 100%; /* Высота равна контейнеру */
+    animation: slide 15s infinite ease-in-out; /* Анимация */
+}
+
+.slideshow img {
+    width: 33.33%; /* Каждое изображение занимает 1/3 ширины слайдшоу */
+    height: 100%; /* Высота равна контейнеру */
+    object-fit: cover; /* Заполняет контейнер, сохраняя пропорции */
+    object-position: center center; /* Центрируем изображение */
+    flex-shrink: 0; /* Предотвращаем сжатие */
+}
+
+/* Анимация слайдшоу */
+@keyframes slide {
+    0% {
+        transform: translateX(0); /* Первое изображение */
+    }
+    25% {
+        transform: translateX(0); /* Задержка первого */
+    }
+    33.33% {
+        transform: translateX(-33.33%); /* Второе изображение */
+    }
+    58.33% {
+        transform: translateX(-33.33%); /* Задержка второго */
+    }
+    66.66% {
+        transform: translateX(-66.66%); /* Третье изображение */
+    }
+    91.66% {
+        transform: translateX(-66.66%); /* Задержка третьего */
+    }
+    100% {
+        transform: translateX(0); /* Возврат к первому */
+    }
+}
+
+/* Медиа-запросы для мобильных устройств */
+@media (max-width: 768px) {
+    .slideshow-container {
+        max-width: 100%; /* Убираем ограничение ширины */
+        aspect-ratio: 16 / 9; /* Более узкое соотношение сторон для мобильных */
+    }
+
+    .slideshow {
+        width: 300%; /* Сохраняем пропорции */
+    }
+
+    .slideshow img {
+        width: 33.33%;
+        height: 100%;
+        object-fit: cover; /* Заполняем, но с учётом пропорций */
+    }
+}
+
+@media (max-width: 480px) {
+    .slideshow-container {
+        aspect-ratio: 4 / 3; /* Ещё более узкое соотношение для маленьких экранов */
+    }
+
+    .slideshow img {
+        width: 33.33%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+@media (max-width: 320px) {
+    .slideshow-container {
+        aspect-ratio: 3 / 2; /* Соотношение для очень маленьких экранов */
+    }
+}
