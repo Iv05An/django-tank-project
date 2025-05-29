@@ -57,7 +57,7 @@ ROOT_URLCONF = 'myportal.urls'  # Оставляем как есть, соотв
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],  # Путь к папке с шаблонами
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

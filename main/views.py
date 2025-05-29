@@ -351,6 +351,7 @@ from django.contrib.contenttypes.models import ContentType
 from .models import Article, Comment, LikeDislike
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+import logging
 
 def get_updates(request, slug):
     article = get_object_or_404(Article, slug=slug)
@@ -468,35 +469,19 @@ def get_client_ip(request):
         ip = request.META.get('REMOTE_ADDR')
     return ip
 
+logger = logging.getLogger(__name__)
+
 def article_detail(request, slug):
-    print(f"Processing slug: {slug}")
+    logger.info(f"Processing slug: {slug}")
     article = get_object_or_404(Article, slug=slug)
     comments = article.comments.all()
     comment_form = CommentForm()
     content_type = ContentType.objects.get_for_model(Article)
     client_ip = get_client_ip(request)
-    likes = LikeDislike.objects.filter(
-        content_type=content_type,
-        object_id=article.id,
-        value='like'
-    ).count()
-    dislikes = LikeDislike.objects.filter(
-        content_type=content_type,
-        object_id=article.id,
-        value='dislike'
-    ).count()
-    user_liked = LikeDislike.objects.filter(
-        content_type=content_type,
-        object_id=article.id,
-        ip_address=client_ip,
-        value='like'
-    ).exists()
-    user_disliked = LikeDislike.objects.filter(
-        content_type=content_type,
-        object_id=article.id,
-        ip_address=client_ip,
-        value='dislike'
-    ).exists()
+    likes = LikeDislike.objects.filter(content_type=content_type, object_id=article.id, value='like').count()
+    dislikes = LikeDislike.objects.filter(content_type=content_type, object_id=article.id, value='dislike').count()
+    user_liked = LikeDislike.objects.filter(content_type=content_type, object_id=article.id, ip_address=client_ip, value='like').exists()
+    user_disliked = LikeDislike.objects.filter(content_type=content_type, object_id=article.id, ip_address=client_ip, value='dislike').exists()
 
     context = {
         'article': article,
@@ -508,20 +493,19 @@ def article_detail(request, slug):
         'user_disliked': user_disliked,
         'content_type_id': content_type.id,
     }
-    print("Context:", context)
+    logger.info(f"Context: {context}")
     try:
-        # Выбор шаблона в зависимости от slug
         if slug == 't-34':
             template = 'main/T34.html'
         elif slug == 'is-3':
             template = 'main/IS3.html'
         else:
-            template = 'main/IS3.html'  # По умолчанию для других статей
+            template = 'main/IS3.html'
+        logger.info(f"Using template: {template}")
         return render(request, template, context)
     except Exception as e:
-        print(f"Ошибка при рендеринге шаблона: {str(e)}")
+        logger.error(f"Ошибка при рендеринге шаблона: {str(e)}")
         raise
-
 def add_comment(request):
     if request.method != 'POST':
         return JsonResponse({'status': 'error', 'message': 'Метод не разрешён'}, status=405)
