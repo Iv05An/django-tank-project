@@ -32,3 +32,4 @@ dj-database-url==2.2.0
 psycopg2-binary==2.9.9
 python-decouple==3.8
 channels_redis
+django-cors-headers==4.5.0
