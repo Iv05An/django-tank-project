@@ -31,13 +31,15 @@ INSTALLED_APPS = [
 ASGI_APPLICATION = 'myportal.asgi.application'
 
 CHANNEL_LAYERS = {
+    # 'default': {
+    #     'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Для тестирования
+    #
+    # },
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Для тестирования
-        # Для продакшена с Redis:
-        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        # 'CONFIG': {
-        #     "hosts": [('127.0.0.1', 6379)],
-        # },
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],  # Использует REDIS_URL или локальный Redis для теста
+        },
     },
 }
 
