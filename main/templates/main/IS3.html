@@ -181,34 +181,34 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('WebSocket подключен');
     };
 
-    socket.onmessage = (event) => {
-        console.log('Received WebSocket message:', event.data);
-        const data = JSON.parse(event.data);
-        if (data.type === 'article_update') {
-            // Обновление комментариев
-            commentsList.innerHTML = '';
-            data.data.comments.forEach(comment => {
-                const commentDiv = document.createElement('div');
-                commentDiv.className = 'comment';
-                commentDiv.dataset.id = comment.id;
-                commentDiv.innerHTML = `
-                    <strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):
-                    <p>${comment.content}</p>
-                `;
-                commentsList.prepend(commentDiv);
-            });
-            // Обновление лайков и дизлайков
-            likesCount.textContent = data.data.likes;
-            dislikesCount.textContent = data.data.dislikes;
-            likeBtn.classList.toggle('active', data.data.user_liked || false);
-            dislikeBtn.classList.toggle('active', data.data.user_disliked || false);
-            likeBtn.disabled = data.data.user_liked || false;
-            dislikeBtn.disabled = data.data.user_disliked || false;
-        }
-    };
+    
+	
+	socket.onmessage = (event) => {
+		console.log('Received WebSocket message:', event.data);
+		const data = JSON.parse(event.data);
+		if (data.type === 'article_update') {
+			likesCount.textContent = data.data.likes;
+			dislikesCount.textContent = data.data.dislikes;
+			likeBtn.classList.toggle('active', data.data.user_liked || false);
+			dislikeBtn.classList.toggle('active', data.data.user_disliked || false);
+			likeBtn.disabled = data.data.user_liked || false;
+			dislikeBtn.disabled = data.data.user_disliked || false;
+			commentsList.innerHTML = '';
+			data.data.comments.forEach(comment => {
+				const commentDiv = document.createElement('div');
+				commentDiv.className = 'comment';
+				commentDiv.dataset.id = comment.id;
+				commentDiv.innerHTML = `
+					<strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):
+					<p>${comment.content}</p>
+				`;
+				commentsList.prepend(commentDiv);
+			});
+		}
+	};
 
-    socket.onclose = () => {
-        console.error('WebSocket закрыт');
+    socket.onclose = (event) => {
+        console.error('WebSocket закрыт:', event);
     };
 
     socket.onerror = (error) => {
@@ -234,11 +234,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            fetch('{% url "add_comment" %}', {
+            fetch('/add_comment/', {  // Используем абсолютный путь для тестирования
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-CSRFToken': getCookie('csrftoken'),  // Используем функцию для получения токена
                 },
                 body: JSON.stringify({
                     article_id: articleId,
@@ -246,7 +246,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     content: content,
                 }),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
             .then(data => {
                 if (data.status === 'success') {
                     usernameInput.value = '';
@@ -264,16 +267,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Функция для получения CSRF-токена
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     // Обработка лайков и дизлайков
     function toggleLikeDislike(action) {
         likeBtn.disabled = true;
         dislikeBtn.disabled = true;
 
-        fetch('{% url "toggle_like_dislike" %}', {
+        fetch('/toggle_like_dislike/', {  // Используем абсолютный путь для тестирования
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}',
+                'X-CSRFToken': getCookie('csrftoken'),
             },
             body: JSON.stringify({
                 content_type_id: contentTypeId,
@@ -281,7 +300,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 action: action,
             }),
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             if (data.status === 'success') {
                 likesCount.textContent = data.likes;
