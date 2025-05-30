@@ -4,16 +4,13 @@
 {% block title %}Танк Т-34 - SOVIET TANKS{% endblock %}
 
 {% block content %}
-
 <div class="article-section">
     <h2>Т-34 — легендарный танк Второй мировой войны</h2>
     <p>Т-34 — один из самых известных танков в истории, символ советской бронетехники и ключевая боевая машина Великой Отечественной войны. Он сочетал в себе передовые технические решения, благодаря которым стал не только самым массовым средним танком Второй мировой, но и одним из самых эффективных.</p>
     <img src="{% static 'images/scale_1200.jpeg' %}" class="blurred-edges" alt="Танк Т-34">
     <h3>История создания</h3>
     <p>Разработка Т-34 началась в 1937 году на Харьковском заводе № 183 под руководством Михаила Кошкина. Новый танк должен был заменить устаревающий БТ-7 и обладать высокой мобильностью, мощным вооружением и надёжной бронёй. В 1940 году Т-34 был принят на вооружение Красной армии, а его серийное производство развернулось на нескольких заводах.</p>
-
     <img src="{% static 'images/242613_195_pic_278.jpg' %}" class="blurred-edges" alt="Танк Т-34">
-
     <h3>Технические характеристики</h3>
     <ul>
         <li><strong>Класс:</strong> средний танк</li>
@@ -24,7 +21,6 @@
         <li><strong>Скорость:</strong> до 55 км/ч</li>
         <li><strong>Запас хода:</strong> до 300 км</li>
     </ul>
-
     <h3>Роль в Великой Отечественной войне</h3>
     <p>С первых дней войны Т-34 доказал своё превосходство над немецкими танками. Его наклонная броня лучше противостояла снарядам, а мощная пушка эффективно поражала технику противника. Однако ранние версии страдали от недостатков, таких как слабая обзорность и нехватка радиостанций. В 1943 году появилась модернизированная версия Т-34-85 с усиленной бронёй и новым вооружением, что позволило уверенно бороться с «Тиграми» и «Пантерами».</p>
     <img src="{% static 'images/maxresdefault.jpg' %}" class="blurred-edges" alt="Танк Т-34">
@@ -34,45 +30,43 @@
     <p>Т-34 стал не просто танком, а легендой, доказав, что сочетание простоты, надёжности и боевой мощи может изменить ход истории.</p>
 
     <!-- Лайки и дизлайки -->
-<div class="like-dislike-section" style="margin: 20px 0;">
-    <button id="like-btn" class="{% if user_liked %}active{% endif %}" {% if user_liked %}disabled{% endif %}>👍 <span id="likes-count">{{ likes }}</span></button>
-    <button id="dislike-btn" class="{% if user_disliked %}active{% endif %}" {% if user_disliked %}disabled{% endif %}>👎 <span id="dislikes-count">{{ dislikes }}</span></button>
-</div>
-
-<!-- Комментарии -->
-<div class="comments-section">
-    <h3>Комментарии</h3>
-    <div id="comments-list">
-        {% for comment in comments %}
-            <div class="comment" data-id="{{ comment.id }}">
-                <strong>{{ comment.username }}</strong> ({{ comment.created_at }}):
-                <p>{{ comment.content }}</p>
-            </div>
-        {% endfor %}
+    <div class="like-dislike-section" style="margin: 20px 0;">
+        <button id="like-btn" class="{% if user_liked %}active{% endif %}" {% if user_liked %}disabled{% endif %}>👍 <span id="likes-count">{{ likes }}</span></button>
+        <button id="dislike-btn" class="{% if user_disliked %}active{% endif %}" {% if user_disliked %}disabled{% endif %}>👎 <span id="dislikes-count">{{ dislikes }}</span></button>
     </div>
 
-    <!-- Форма для комментариев -->
-    <div class="feedback-container">
-        <h3>Оставить комментарий</h3>
-        <form id="comment-form" class="feedback-form">
-            {% csrf_token %}
-            <div class="form-group">
-                {{ comment_form.username.label_tag }}
-                {{ comment_form.username }}
-                <span class="error" id="username-error"></span>
-            </div>
-            <div class="form-group">
-                {{ comment_form.content.label_tag }}
-                {{ comment_form.content }}
-                <span class="error" id="comment-error"></span>
-            </div>
-            <button type="submit">Отправить</button>
-        </form>
+    <!-- Комментарии -->
+    <div class="comments-section">
+        <h3>Комментарии</h3>
+        <div id="comments-list">
+            {% for comment in comments %}
+                <div class="comment" data-id="{{ comment.id }}">
+                    <strong>{{ comment.username }}</strong> ({{ comment.created_at }}):
+                    <p>{{ comment.content }}</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Форма для комментариев -->
+        <div class="feedback-container">
+            <h3>Оставить комментарий</h3>
+            <form id="comment-form" class="feedback-form">
+                {% csrf_token %} <!-- Убедимся, что токен есть -->
+                <div class="form-group">
+                    {{ comment_form.username.label_tag }}
+                    {{ comment_form.username }}
+                    <span class="error" id="username-error"></span>
+                </div>
+                <div class="form-group">
+                    {{ comment_form.content.label_tag }}
+                    {{ comment_form.content }}
+                    <span class="error" id="comment-error"></span>
+                </div>
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
     </div>
 </div>
-
-</div>
-
 
 <style>
 .like-dislike-section button {
@@ -212,8 +206,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    socket.onclose = () => {
-        console.error('WebSocket закрыт');
+    socket.onclose = (event) => {
+        console.error('WebSocket закрыт:', event);
     };
 
     socket.onerror = (error) => {
@@ -239,11 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            fetch('{% url "add_comment" %}', {
+            fetch('/add_comment/', {  // Используем абсолютный путь для тестирования
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-CSRFToken': getCookie('csrftoken'),  // Используем функцию для получения токена
                 },
                 body: JSON.stringify({
                     article_id: articleId,
@@ -251,7 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     content: content,
                 }),
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
             .then(data => {
                 if (data.status === 'success') {
                     usernameInput.value = '';
@@ -269,16 +266,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Функция для получения CSRF-токена
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
     // Обработка лайков и дизлайков
     function toggleLikeDislike(action) {
         likeBtn.disabled = true;
         dislikeBtn.disabled = true;
 
-        fetch('{% url "toggle_like_dislike" %}', {
+        fetch('/toggle_like_dislike/', {  // Используем абсолютный путь для тестирования
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}',
+                'X-CSRFToken': getCookie('csrftoken'),
             },
             body: JSON.stringify({
                 content_type_id: contentTypeId,
@@ -286,7 +299,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 action: action,
             }),
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             if (data.status === 'success') {
                 likesCount.textContent = data.likes;
