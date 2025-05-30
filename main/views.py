@@ -689,30 +689,91 @@ def article_detail(request, slug):
 #         print(f"Error in toggle_like_dislike: {str(e)}")
 #         return JsonResponse({'status': 'error', 'message': f'Internal Server Error: {str(e)}'}, status=500)
 
-@csrf_exempt  # Замени на CSRF-проверку в продакшене
+
+@require_POST
 def toggle_like_dislike(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        content_type_id = data.get('content_type_id')
-        object_id = data.get('object_id')
-        action = data.get('action')
-        # Логика лайков/дизлайков (замени на свою)
+    data = json.loads(request.body)
+    content_type_id = data.get('content_type_id')
+    object_id = data.get('object_id')
+    action = data.get('action')
+
+    try:
+        article = Article.objects.get(id=object_id)
+        content_type = ContentType.objects.get(id=content_type_id)
+        ip_address = request.META.get('REMOTE_ADDR')  # Используем IP-адрес
+
+        # Удаляем предыдущий голос с этого IP, если есть
+        LikeDislike.objects.filter(content_type=content_type, object_id=object_id, ip_address=ip_address).delete()
+
+        # Добавляем новый голос
+        LikeDislike.objects.create(
+            content_type=content_type,
+            object_id=object_id,
+            ip_address=ip_address,
+            value=action
+        )
+
+        likes = LikeDislike.objects.filter(content_type=content_type, object_id=object_id, value='like').count()
+        dislikes = LikeDislike.objects.filter(content_type=content_type, object_id=object_id, value='dislike').count()
+        user_liked = LikeDislike.objects.filter(content_type=content_type, object_id=object_id, ip_address=ip_address, value='like').exists()
+        user_disliked = LikeDislike.objects.filter(content_type=content_type, object_id=object_id, ip_address=ip_address, value='dislike').exists()
+
+        # Отправка обновления через WebSocket
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'article_{article.slug}',
+            {
+                'type': 'article_update',
+                'data': {
+                    'likes': likes,
+                    'dislikes': dislikes,
+                    'user_liked': user_liked,
+                    'user_disliked': user_disliked,
+                    'comments': list(Comment.objects.filter(article=article).values('id', 'username', 'content', 'created_at')),
+                }
+            }
+        )
+
         return JsonResponse({
             'status': 'success',
-            'likes': 1,  # Пример
-            'dislikes': 0,
-            'user_liked': action == 'like',
-            'user_disliked': action == 'dislike',
+            'likes': likes,
+            'dislikes': dislikes,
+            'user_liked': user_liked,
+            'user_disliked': user_disliked,
         })
-    return JsonResponse({'status': 'error'}, status=400)
+    except ObjectDoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Article not found'}, status=404)
 
-@csrf_exempt  # Замени на CSRF-проверку в продакшене
+@require_POST
 def add_comment(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        article_id = data.get('article_id')
-        username = data.get('username')
-        content = data.get('content')
-        # Логика добавления комментария (замени на свою)
-        return JsonResponse({'status': 'success', 'message': 'Комментарий добавлен'})
-    return JsonResponse({'status': 'error'}, status=400)
+    data = json.loads(request.body)
+    article_id = data.get('article_id')
+    username = data.get('username')
+    content = data.get('content')
+
+    try:
+        article = Article.objects.get(id=article_id)
+        comment = Comment.objects.create(article=article, username=username, content=content)
+
+        # Отправка обновления через WebSocket
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'article_{article.slug}',
+            {
+                'type': 'article_update',
+                'data': {
+                    'likes': LikeDislike.objects.filter(content_type=ContentType.objects.get_for_model(Article), object_id=article.id, value='like').count(),
+                    'dislikes': LikeDislike.objects.filter(content_type=ContentType.objects.get_for_model(Article), object_id=article.id, value='dislike').count(),
+                    'user_liked': False,  # IP не проверяем для лайков в этом контексте
+                    'user_disliked': False,
+                    'comments': list(Comment.objects.filter(article=article).values('id', 'username', 'content', 'created_at')),
+                }
+            }
+        )
+
+        return JsonResponse({
+            'status': 'success',
+            'comments': list(Comment.objects.filter(article=article).values('id', 'username', 'content', 'created_at')),
+        })
+    except ObjectDoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Article not found'}, status=404)

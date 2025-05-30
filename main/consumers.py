@@ -97,36 +97,30 @@ import json
 
 class ArticleConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.slug = self.scope['url_route']['kwargs']['slug']
-        self.room_group_name = f'article_{self.slug}'
+        self.article_slug = self.scope['url_route']['kwargs']['slug']
+        self.article_group_name = f'article_{self.article_slug}'
 
+        # Присоединяемся к группе
         await self.channel_layer.group_add(
-            self.room_group_name,
+            self.article_group_name,
             self.channel_name
         )
         await self.accept()
 
     async def disconnect(self, close_code):
+        # Покидаем группу при отключении
         await self.channel_layer.group_discard(
-            self.room_group_name,
+            self.article_group_name,
             self.channel_name
         )
 
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'article_update',
-                'message': message
-            }
-        )
+        # Обработка входящих сообщений (если нужно)
+        pass
 
     async def article_update(self, event):
-        message = event['message']
+        # Отправка обновления клиенту
         await self.send(text_data=json.dumps({
             'type': 'article_update',
-            'message': message
+            'data': event['data']
         }))

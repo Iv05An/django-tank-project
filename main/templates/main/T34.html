@@ -180,31 +180,31 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('WebSocket подключен');
     };
 
-    socket.onmessage = (event) => {
-        console.log('Received WebSocket message:', event.data);
-        const data = JSON.parse(event.data);
-        if (data.type === 'article_update') {
-            // Обновление комментариев
-            commentsList.innerHTML = '';
-            data.data.comments.forEach(comment => {
-                const commentDiv = document.createElement('div');
-                commentDiv.className = 'comment';
-                commentDiv.dataset.id = comment.id;
-                commentDiv.innerHTML = `
-                    <strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):
-                    <p>${comment.content}</p>
-                `;
-                commentsList.prepend(commentDiv);
-            });
-            // Обновление лайков и дизлайков
-            likesCount.textContent = data.data.likes;
-            dislikesCount.textContent = data.data.dislikes;
-            likeBtn.classList.toggle('active', data.data.user_liked || false);
-            dislikeBtn.classList.toggle('active', data.data.user_disliked || false);
-            likeBtn.disabled = data.data.user_liked || false;
-            dislikeBtn.disabled = data.data.user_disliked || false;
-        }
-    };
+    
+	
+	socket.onmessage = (event) => {
+		console.log('Received WebSocket message:', event.data);
+		const data = JSON.parse(event.data);
+		if (data.type === 'article_update') {
+			likesCount.textContent = data.data.likes;
+			dislikesCount.textContent = data.data.dislikes;
+			likeBtn.classList.toggle('active', data.data.user_liked || false);
+			dislikeBtn.classList.toggle('active', data.data.user_disliked || false);
+			likeBtn.disabled = data.data.user_liked || false;
+			dislikeBtn.disabled = data.data.user_disliked || false;
+			commentsList.innerHTML = '';
+			data.data.comments.forEach(comment => {
+				const commentDiv = document.createElement('div');
+				commentDiv.className = 'comment';
+				commentDiv.dataset.id = comment.id;
+				commentDiv.innerHTML = `
+					<strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):
+					<p>${comment.content}</p>
+				`;
+				commentsList.prepend(commentDiv);
+			});
+		}
+	};
 
     socket.onclose = (event) => {
         console.error('WebSocket закрыт:', event);
