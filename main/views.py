@@ -347,6 +347,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from .forms import RegistrationForm, CommentForm
 import json
+from django.views.decorators.http import require_POST
 from django.contrib.contenttypes.models import ContentType
 from .models import Article, Comment, LikeDislike
 from channels.layers import get_channel_layer
