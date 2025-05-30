@@ -355,6 +355,8 @@ from asgiref.sync import async_to_sync
 import logging
 from django.views.decorators.csrf import csrf_exempt
 
+from django.core.exceptions import ObjectDoesNotExist  # Добавлен импорт
+
 def get_updates(request, slug):
     article = get_object_or_404(Article, slug=slug)
     comments = article.comments.all().values('id', 'username', 'content', 'created_at')
@@ -701,7 +703,7 @@ def toggle_like_dislike(request):
     try:
         article = Article.objects.get(id=object_id)
         content_type = ContentType.objects.get(id=content_type_id)
-        ip_address = request.META.get('REMOTE_ADDR')  # Используем IP-адрес
+        ip_address = request.META.get('REMOTE_ADDR')
 
         # Удаляем предыдущий голос с этого IP, если есть
         LikeDislike.objects.filter(content_type=content_type, object_id=object_id, ip_address=ip_address).delete()
@@ -719,6 +721,18 @@ def toggle_like_dislike(request):
         user_liked = LikeDislike.objects.filter(content_type=content_type, object_id=object_id, ip_address=ip_address, value='like').exists()
         user_disliked = LikeDislike.objects.filter(content_type=content_type, object_id=object_id, ip_address=ip_address, value='dislike').exists()
 
+        # Преобразуем datetime в строку для комментариев
+        comments = Comment.objects.filter(article=article).values('id', 'username', 'content', 'created_at')
+        comments_serializable = [
+            {
+                'id': comment['id'],
+                'username': comment['username'],
+                'content': comment['content'],
+                'created_at': comment['created_at'].isoformat()  # Преобразуем datetime в строку
+            }
+            for comment in comments
+        ]
+
         # Отправка обновления через WebSocket
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
@@ -730,7 +744,7 @@ def toggle_like_dislike(request):
                     'dislikes': dislikes,
                     'user_liked': user_liked,
                     'user_disliked': user_disliked,
-                    'comments': list(Comment.objects.filter(article=article).values('id', 'username', 'content', 'created_at')),
+                    'comments': comments_serializable,
                 }
             }
         )
@@ -756,6 +770,18 @@ def add_comment(request):
         article = Article.objects.get(id=article_id)
         comment = Comment.objects.create(article=article, username=username, content=content)
 
+        # Преобразуем datetime в строку для комментариев
+        comments = Comment.objects.filter(article=article).values('id', 'username', 'content', 'created_at')
+        comments_serializable = [
+            {
+                'id': comment['id'],
+                'username': comment['username'],
+                'content': comment['content'],
+                'created_at': comment['created_at'].isoformat()  # Преобразуем datetime в строку
+            }
+            for comment in comments
+        ]
+
         # Отправка обновления через WebSocket
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
@@ -765,16 +791,16 @@ def add_comment(request):
                 'data': {
                     'likes': LikeDislike.objects.filter(content_type=ContentType.objects.get_for_model(Article), object_id=article.id, value='like').count(),
                     'dislikes': LikeDislike.objects.filter(content_type=ContentType.objects.get_for_model(Article), object_id=article.id, value='dislike').count(),
-                    'user_liked': False,  # IP не проверяем для лайков в этом контексте
+                    'user_liked': False,
                     'user_disliked': False,
-                    'comments': list(Comment.objects.filter(article=article).values('id', 'username', 'content', 'created_at')),
+                    'comments': comments_serializable,
                 }
             }
         )
 
         return JsonResponse({
             'status': 'success',
-            'comments': list(Comment.objects.filter(article=article).values('id', 'username', 'content', 'created_at')),
+            'comments': comments_serializable,
         })
     except ObjectDoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Article not found'}, status=404)
